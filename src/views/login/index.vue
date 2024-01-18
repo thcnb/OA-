@@ -1,6 +1,37 @@
 <template>
   <div class="login">
-    <h1>2</h1>
+    <div class="left" />
+    <div class="right">
+      <h1>手机号登录</h1>
+      <el-form
+        ref="ruleForm"
+        :model="ruleForm"
+        :rules="rules"
+        class="demo-ruleForm"
+      >
+        <el-form-item prop="name">
+          <el-input v-model="ruleForm.name" placeholder="请输入手机号" />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="ruleForm.password"
+            type="password"
+            show-password
+            placeholder="请输入密码"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="ruleForm.isAgree" prop="isAgree">请阅读协议</el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            style="width: 350px"
+            @click="submitForm"
+          >立即创建</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -8,54 +39,75 @@
 export default {
   name: 'Login',
   data() {
-    return {}
+    const ageree = (rule, value, callback) => {
+      value ? callback() : callback(new Error('请阅读协议'))
+    }
+    return {
+      ruleForm: {
+        name: '',
+        password: '',
+        isAgree: false
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          {
+            pattern: /^1[3456789]\d{9}$/,
+            message: '请输入正确的手机号',
+            trigger: 'blur'
+          }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
+        ],
+        isAgree: [
+          {
+            validator: ageree
+          }
+        ]
+      }
+    }
+  },
+  methods: {
+    submitForm() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          alert('submit!')
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    }
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg: #283443;
-$light_gray: #fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
+.login {
+  display: flex;
+  .left {
+    width: 60%;
+    height: 100vh;
+    background-image: url('../../assets/common/login_back.png');
+    background-size: 100% 100%;
   }
-}
-
-/* reset element-ui css */
-.login-container {
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
+  .right {
+    width: 40%;
+    height: 100vh;
+    background-color: #fff;
+    padding-left: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    h1 {
+      font-size: 16px;
     }
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
+    .el-input {
+      width: 350px;
+      background-color: #ccc;
+    }
   }
 }
 </style>
